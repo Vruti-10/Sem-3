@@ -1,81 +1,65 @@
-package Project;
+import java.util.*;
+import exception.*;
 
-import java.util.Scanner;
-
-// Record
-record BankInfo(String name, String branch) {
-}
-
-// Enum
-enum MenuOption {
-    OPEN_ACCOUNT,
-    DEPOSIT,
-    WITHDRAW,
-    TRANSFER,
-    WORKING_HOURS,
-    EXIT
-}
-
-// Main class
 public class MiniBank {
 
-    public static void main(String[] args) {
+    private Map<String, Account> accounts =
+            new HashMap<>();
 
-        Scanner sc = new Scanner(System.in);
+    public void addAccount(Account account) {
 
-        // Bank information
-        BankInfo bank = new BankInfo("MiniBank", "CHARUSAT");
+        accounts.put(
+                account.getAccountNumber(),
+                account
+        );
 
-        // Header
-        System.out.println("================================");
-        System.out.println("          " + bank.name());
-        System.out.println("          " + bank.branch());
-        System.out.println("================================");
+        System.out.println(
+                "Account added successfully."
+        );
+    }
 
-        boolean running = true;
+    public Account findAccount(String accountNumber)
+            throws AccountNotFoundException {
 
-        while (running) {
+        Account account = accounts.get(accountNumber);
 
-            // Display menu
-            System.out.println("\n========== MENU ==========");
-            System.out.println("1. Open Account");
-            System.out.println("2. Deposit");
-            System.out.println("3. Withdraw");
-            System.out.println("4. Transfer");
-            System.out.println("5. Working Hours");
-            System.out.println("6. Exit");
-            System.out.println("==========================");
+        if (account == null) {
 
-            System.out.print("Enter your choice: ");
-
-            int choice = sc.nextInt();
-
-            // Switch expression
-            String message = switch (choice) {
-
-                case 1 -> "Open Account - to be implemented in a later lab";
-
-                case 2 -> "Deposit - to be implemented in a later lab";
-
-                case 3 -> "Withdraw - to be implemented in a later lab";
-
-                case 4 -> "Transfer - to be implemented in a later lab";
-
-                case 5 -> "Working Hours: Monday to Saturday, 9 AM to 5 PM";
-
-                case 6 -> "Goodbye! Thank you for using MiniBank.";
-
-                default -> "Invalid choice! Please enter a number from 1 to 6.";
-            };
-
-            System.out.println(message);
-
-            // Stop program when user chooses 6
-            if (choice == 6) {
-                running = false;
-            }
+            throw new AccountNotFoundException(
+                    "Account not found: "
+                    + accountNumber
+            );
         }
 
-        sc.close();
+        return account;
+    }
+
+    public void transfer(
+            Account from,
+            Account to,
+            long amount)
+            throws BankException {
+
+        try {
+
+            from.withdraw(amount);
+
+            to.deposit(amount);
+
+            System.out.println(
+                    "Transfer successful."
+            );
+
+        } catch (InvalidAmountException |
+                 InsufficientFundsException e) {
+
+            throw e;
+
+        } finally {
+
+            System.out.println(
+                    "Transfer operation completed."
+            );
+        }
     }
 }
